@@ -121,7 +121,7 @@ export function lockeeHistory(lockeeData: LockeeDataResponse, options: { showRat
   // Embed Message Block
   const messageBlock = {
     embed: {
-      title: `${lockeeData.data.discordID ? '<:verified:625628727820288000> ' : ''}\`${lockeeData.data.username}\` - ChastiKey Lockee Statistics - Historical View`,
+      title: `${lockeeData.data.discordID ? '<:verified:748870375139573840> ' : ''}\`${lockeeData.data.username}\` - ChastiKey Lockee Statistics - Historical View`,
       description: description,
       color: 9125611,
       timestamp: Date.now(),

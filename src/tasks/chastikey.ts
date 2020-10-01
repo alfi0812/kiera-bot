@@ -40,7 +40,7 @@ export class ChastiKeyBackgroundVerifiedMonitor extends ChastiKeyVerifiedRoleMon
   // Setting the props for this Task
   name = 'ChastiKeyBackgroundVerifiedMonitor'
   frequency = 1800000 / 30 // 1 minute
-  verifiedRole = 'ChastiKey Verified'
+  verifiedRole = 'CK Verified'
 }
 
 export class ChastiKeyGenerateStatsScheduled extends ChastiKeyGenerateStats {

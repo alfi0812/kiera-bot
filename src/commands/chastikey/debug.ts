@@ -16,9 +16,9 @@ export const Routes = ExportRoutes({
     defaultEnabled: true,
     serverOnly: true,
     restrictedTo: [
-      '473856245166506014', // KevinCross#0001
-      '146439529824256000', // Emma#1366
-      '448856044840550403' // Sanni#0001
+      '715198203598864485',
+            '705412678142656655',
+            '448856044840550403'
     ]
   }
 })

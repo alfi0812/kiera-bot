@@ -5,7 +5,7 @@ export function searchResults(found: Array<UserData>, routerStats: RouterStats, 
   var description = ``
 
   found.forEach(ckUser => {
-    description += `${ckUser.isVerified ? '<:verified:631826983688339474> ' : ''}${ckUser.username}\n`
+    description += `${ckUser.isVerified ? '<:verified:748870375139573840> ' : ''}${ckUser.username}\n`
   })
 
   return {
