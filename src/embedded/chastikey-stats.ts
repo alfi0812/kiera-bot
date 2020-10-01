@@ -25,25 +25,25 @@ export interface TrackedKeyholderLockeesStatistics {
 }
 
 const indicatorEmoji = {
-  Frozen: `<:frozenlock:539233483537645568>`,
-  Hidden: `<:hiddencircle:474973202607767562>`,
-  TrustedKH: `<:trustkeyholder:474975187310346240>`
+  Frozen: `<:frozenlock:748865648662282361>`,
+  Hidden: `<:hiddencircle:748865648414818375>`,
+  TrustedKH: `<:trustkeyholder:748865648393977907>`
 }
 
 const cardsEmoji = {
-  Yellow: `<:10:601169212370583553>`,
-  YellowMinus2: `<:12:601169259107713045>`,
-  YellowMinus1: `<:11:601169242859110436>`,
-  YellowAdd3: `<:9_:601169195744362516>`,
-  YellowAdd2: `<:8_:601169176651890700>`,
-  YellowAdd1: `<:7_:601169162370416640>`,
-  Reset: `<:6_:601169148843917322>`,
-  Red: `<:5_:601169109954330635>`,
-  GoAgain: '<:2_:601169068837568542>',
-  Green: `<:3_:601169082066141238>`,
-  DoubleUp: `<:4_:601169095982841856>`,
-  Freeze: `<:1_:601169050294419476>`,
-  Sticky: `<:stickycard:726348014977024011>`
+  Yellow: `<:10:748872506726940692>`,
+  YellowMinus2: `<:12:748865648578527272>`,
+  YellowMinus1: `<:11:748865648687448095>`,
+  YellowAdd3: `<:9_:748865648293314601>`,
+  YellowAdd2: `<:8_:748865648636985375>`,
+  YellowAdd1: `<:7_:748865648200908802>`,
+  Reset: `<:6_:748865648662282360>`,
+  Red: `<:5_:748865648503029771>`,
+  GoAgain: '<:2_:748865648515481630>',
+  Green: `<:3_:748865648460824586>`,
+  DoubleUp: `<:4_:748865648398172200>`,
+  Freeze: `<:1_:748865648402235434>`,
+  Sticky: `<:stickycard:748865648494641162>`
 }
 
 export function lockeeStats(lockeeData: LockeeDataResponse, options: { showRating: boolean }, routed: RouterRouted) {
@@ -106,7 +106,7 @@ export function lockeeStats(lockeeData: LockeeDataResponse, options: { showRatin
     embed: {
       title: routed.$render('ChastiKey.Stats.Lockee.Title', {
         isVerified: lockeeData.data.discordID ? true : false,
-        verifiedEmoji: '<:verified:625628727820288000> ',
+        verifiedEmoji: '<:verified:748870375139573840> ',
         username: lockeeData.data.username
       }),
       description: description,
@@ -299,7 +299,7 @@ export function keyholderStats(
 
   if (keyholderData.noOfRatings > 4 && options.showRating) description += `Avg Rating **\`${keyholderData.averageRating}\`** | # Ratings **\`${keyholderData.noOfRatings}\`**\n`
   description += `# of Users Locked **\`${keyholderData.noOfLocksManagingNow}\`**\n`
-  description += `# of Locks Flagged As Trusted **\`${keyholderData.noOfLocksFlaggedAsTrusted}\`** <:trustkeyholder:474975187310346240>\n`
+  description += `# of Locks Flagged As Trusted **\`${keyholderData.noOfLocksFlaggedAsTrusted}\`** <:trustkeyholder:748865648393977907>\n`
   description += `# of Shared Locks **\`${keyholderData.noOfSharedLocks}\`**\nTotal Locks Managed **\`${keyholderData.totalLocksManaged}\`**\n`
   description += `Joined \`${keyholderData.joined.substr(0, 10)}\` ${dateJoinedDaysAgo}\n`
   description += `Date first keyheld \`${dateRearranged}\` ${dateFirstKHAgo}\n`
@@ -324,7 +324,7 @@ export function keyholderStats(
 
   return {
     embed: {
-      title: `${keyholderData.isVerified ? '<:verified:625628727820288000> ' : ''}\`${keyholderData.username}\` - ChastiKey Keyholder Statistics`,
+      title: `${keyholderData.isVerified ? '<:verified:748870375139573840> ' : ''}\`${keyholderData.username}\` - ChastiKey Keyholder Statistics`,
       description: description,
       color: 9125611,
       timestamp: cachedTimestamp,

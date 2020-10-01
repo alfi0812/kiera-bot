@@ -12,7 +12,7 @@ export class ChastiKeyVerifiedRoleMonitor extends Task {
 
   protected async process() {
     // If Debug block is in place, stop here
-    if (process.env.BOT_BLOCK_CKVERIFY) {
+    if (false) {
       if (!this.announcementMade) {
         console.log('Verified Role Monitor::Blocking Verified Role update per debug setting in .env file.')
         this.announcementMade = true
@@ -25,7 +25,7 @@ export class ChastiKeyVerifiedRoleMonitor extends Task {
     try {
       // Get users who are eligible from the db, but only users who have verified their discord ID
       const stored = await this.Bot.DB.getMultiple<TrackedUser>('users', { 'ChastiKey.isVerified': true })
-      const guilds = this.Bot.client.guilds.cache.filter(g => g.id === '473856867768991744' || g.id === '389204362959781899').array()
+      const guilds = this.Bot.client.guilds.cache.filter(g => g.id === '732549557938028585').array()
 
       console.log(`CK Verified Role Monitor::Users Eligible (from users) = ${stored.length}`)
 
