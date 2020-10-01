@@ -39,7 +39,7 @@ export async function update(routed: RouterRouted) {
   // Check if user calling this command is targeting a different user
   if (routed.v.o.user !== undefined) {
     // Restrict Update upon other users to Keyholder or above
-    const khRole = routed.message.guild.roles.cache.find((r) => r.name.toLowerCase() === 'keyholder')
+    const khRole = routed.message.guild.roles.cache.find((r) => r.id === '748473817990430720')
     // User calling this command must be higher than the khRole to call update upon another user than themself
     if (routed.message.member.roles.highest.position < khRole.position) {
       await routed.message.reply(routed.$render('ChastiKey.Error.KeyholderOrAboveRoleRequired'))
