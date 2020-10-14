@@ -92,7 +92,7 @@ ChastiKey:
     DMInstructions: |-
       Scannez ce code avec l'application Chastikey comme si vous chargiez un verrou (valable les 5 prochaines minutes), cela votre compte Discord à ChastiKey.
       Si votre compte ChastiKey est nouveau (15-30 minutes), cela peut prendre du temps pour que Kiera reçoive toutes les données nécessaires.
-    FastForward: Votre compte a été vérifié! Certaines données peuvent encore prendre **jusqu'à 15 minutes** pour être mises en cache et être complètement disponible.
+    FastForward: Votre compte a été vérifié!
     NotSuccessfulUsingReason: '{{reason}}'
     # 1366`
     PreviouslyCompleted: Votre compte a déjà été vérifié! Si cella pose encore problème veuillez contacter emma

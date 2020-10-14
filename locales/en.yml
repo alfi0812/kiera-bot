@@ -124,7 +124,7 @@ ChastiKey:
       Scan this code with the ChastiKey App like loading a lock (within the next 5 minutes), this will verify your Discord Account to ChastiKey.
       If your ChastiKey account is new in the last 15-30 minutes, it may take this long for Kiera to receive all the required data.
     CkeckYourDMs: Check your DMs from Kiera for further instructions.
-    FastForward: Your account has been verified! Some data may still take **up to 15 minutes** to be cached and fully accessable.
+    FastForward: Your account has been verified!
     PreviouslyCompleted: Your account has already been verified! If there are any issues with this please reachout to `emma#1366`
     VerifyRequired: |-
       This command requires your account be verified with ChastiKey using the following command: 

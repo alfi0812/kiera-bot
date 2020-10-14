@@ -162,7 +162,7 @@ ChastiKey:
     DMInstructions: |-
       Scanne diesen Code mit der ChastiKey-App, wie wenn du ein Schloss laden würdest (in den nächsten 5 Minuten). Dies verifiziert deinen Discord-Account mit deiner ChastiKey-App.
       Wenn dein ChastiKey-Account in den letzten 15-30 Minuten erstellt wurde, kann es ähnlich lange dauern, bis Kiera alle erforderlichen Daten empfangen hat.
-    FastForward: Dein Account wurde verifiziert! Es kann allerdings noch **bis zu 15 Minuten** dauern, bis alle Daten korrekt zwischengespeichert und verfügbar sind.
+    FastForward: Dein Account wurde verifiziert!
     NotSuccessfulUsingReason: 'Die Verifizierung hat leider nicht funktioniert. Begründung: {{reason}}'
     # 1366`
     PreviouslyCompleted: Dein Account wurde bereits verifiziert! Wenn es damit irgendwelche Probleme gibt, melde dich bitte bei `Emma#1366`
