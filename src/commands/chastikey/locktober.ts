@@ -60,7 +60,10 @@ export async function statsLocktober(routed: RouterRouted) {
 
   // Set cached timestamp for running locks
   const cachedTimestampFromFetch = await routed.bot.DB.get('scheduled-jobs', { name: 'ChastiKeyAPILocktober2020' }) as Agenda.JobAttributes
-  const cachedTimestamp = cachedTimestampFromFetch.lastFinishedAt
+  let cachedTimestamp = null;
+  if(cachedTimestampFromFetch != null){
+	  cachedTimestamp = cachedTimestampFromFetch.lastFinishedAt;
+  }
 
   await routed.message.channel.send(
     locktoberStats({ participants: stored.length, verified: verifiedCount }, breakdownByKH, apartOfLocktober, true, routed.routerStats, cachedTimestamp)
