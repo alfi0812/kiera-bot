@@ -244,10 +244,10 @@ export async function roleCounts(routed: RouterRouted) {
     if (r.id === '748483991203479652') counts.unlocked = r.members.size
     if (r.id === '748481687289331762') counts.locktober = r.members.size
     // Keyholders
-    if (r.id === '748473817990430720') counts.renowned = r.members.size
-    if (r.id === '748473138915967016') counts.distinguished = r.members.size
-    if (r.id === '748473271128686652') counts.established = r.members.size
-    if (r.id === '748473523265208392') counts.keyholder = r.members.size
+    if (r.id === '748473138915967016') counts.renowned = r.members.size
+    if (r.id === '748473271128686652') counts.distinguished = r.members.size
+    if (r.id === '748473523265208392') counts.established = r.members.size
+    if (r.id === '748473817990430720') counts.keyholder = r.members.size
     if (r.id === '748473944990023681') counts.noviceKh = r.members.size
     // Lockees
     if (r.name.toLowerCase() === 'lockee lvl 5') counts.fanatical = counts.fanatical + r.members.size
