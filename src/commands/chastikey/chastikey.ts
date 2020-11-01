@@ -239,7 +239,7 @@ export async function roleCounts(routed: RouterRouted) {
 
   routed.message.guild.roles.cache.forEach((r) => {
     // Special states
-    if (r.name.toLowerCase() === 'chastikey verified') counts.ckVerified = r.members.size
+    if (r.id === '750288890937737267')  counts.ckVerified = r.members.size
     if (r.id === '748483985801478224')  counts.locked = r.members.size
     if (r.id === '748483991203479652') counts.unlocked = r.members.size
     if (r.id === '748481687289331762') counts.locktober = r.members.size
