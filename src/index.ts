@@ -89,6 +89,7 @@ export class Bot {
     ////////////////////////////////////////
     // Register background tasks
     this.Task.start([
+      new Task.StatusMessageRotatorScheduled(),
       new Task.ChastiKeyAPIUsers(),
       new Task.ChastiKeyAPIRunningLocks(),
       new Task.ChastiKeyAPILocktober2019(),
@@ -169,6 +170,28 @@ export class Bot {
     // this.client.on('messageReactionAdd', (react, user) => this.onMessageCachedReactionAdd(react, user))
     ///  Reaction out (Cached)  ///
     // this.client.on('messageReactionRemove', (react, user) => this.onMessageCachedReactionRemove(react, user))
+
+    /// Update guilds info stored ///
+    for (const guild of this.client.guilds.cache.array()) {
+      // Check if Guild info is cached
+      // console.log('Guild Connection/Update in Servers Collection', guild.id, guild.name)
+      await this.DB.update(
+        'servers',
+        { id: guild.id },
+        {
+          $set: {
+            id: guild.id,
+            region: guild.region,
+            ownerID: guild.ownerID,
+            name: guild.name,
+            joinedTimestamp: guild.joinedTimestamp,
+            lastSeen: Date.now(),
+            prefix: undefined
+          }
+        },
+        { atomic: true, upsert: true }
+      )
+    }
   }
 
   public async onReady() {
@@ -192,7 +215,22 @@ export class Bot {
   private async onGuildCreate(guild: Discord.Guild) {
     this.Log.Bot.log('Joined a new server: ' + guild.name)
     // Save some info about the server in db
-    await this.DB.update('servers', { id: guild.id }, new TrackedServer(guild), { upsert: true })
+    await this.DB.update(
+      'servers',
+      { id: guild.id },
+      {
+        $set: {
+          id: guild.id,
+          region: guild.region,
+          ownerID: guild.ownerID,
+          name: guild.name,
+          joinedTimestamp: guild.joinedTimestamp,
+          lastSeen: Date.now(),
+          prefix: undefined
+        }
+      },
+      { atomic: true, upsert: true }
+    )
   }
 
   private async onGuildDelete(guild: Discord.Guild) {

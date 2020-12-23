@@ -1,3 +1,41 @@
+7.2.0
+- Fixed: Help command not working in DMs.
+- Fixed: Server joining and on startup server's database collection information.
+- Added: Shorter Decision roll IDs or an option for custom names. #21
+
+7.1.1
+- Fixed: English text string for ChastiKey.Customize.MapExpRole to use key names introduced in v7.1.0.
+- Fixed: CK Customize command not able to process values above the previous maximum index, updated for new indexes (105 -> 555).
+
+7.1.0
+- Fixed: CK Ticker missing note about CK's developer when running type 1 or 2 ticker requests.
+- Fixed: CK Update where unable to process roles that have not been mapped.
+- Fixed: CK Update now able to remove roles regardless if they have the proper role yet or not.
+- Updated: CK Ticker command to allow lookup by username.
+- Updated: CK Ticker command to allow date override for ticker start date.
+- Added: CK Ticker message if user has a ticker override date preference set.
+- Added: CK Update 3rd option for roles and updated names of existing in reference text.
+
+7.0.3
+- Fixed: Issue with connecting to some existing servers. #45
+- Updated: Dev dependency responsible for audit warnings.
+
+7.0.2
+- Fixed: Bot unable to reply to DMs due to internal issue trying to find a server for config. #44
+
+7.0.1
+- Fixed: English string for CK Special Roles text showing the Locked and Unlocked (once mapped) in reverse.
+
+7.0.0
+- Added: Custom per server prefix support.
+- Added: Command to set bot's presence message.
+- Added: Presence Status rotator task.
+- Added: Command routing alias support. Support added to a limited set for initial testing.
+- Added: Support for CK Update command to be used on all servers (New CK Customize commands to map roles).
+- Updated: CK Nickname command to have a reset (use: clear) also now has status responses.
+- Updated: Response renderer to include Prefix from server.
+- Updated: Verify command now will use server's prefix in help text.
+
 6.3.0
 - Fixed: CK Locktober last updated footer timestamp.
 - Fixed: CK Fanatical role auto update from CK Update command sometimes giving Devoted as well.

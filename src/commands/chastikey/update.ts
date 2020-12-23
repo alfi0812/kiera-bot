@@ -5,6 +5,7 @@ import * as Discord from 'discord.js'
 import { TrackedUser } from '@/objects/user'
 import { RouterRouted, ExportRoutes } from '@/router'
 import { performance } from 'perf_hooks'
+import { TrackedServerSetting } from '@/objects/server-setting'
 
 export const Routes = ExportRoutes({
   type: 'message',
@@ -14,6 +15,7 @@ export const Routes = ExportRoutes({
   example: '{{prefix}}ck update',
   name: 'ck-update',
   validate: '/ck:string/update:string/user?=string',
+  validateAlias: ['/ck:string/u:string/user?=string'],
   middleware: [Middleware.isCKVerified],
   permissions: {
     defaultEnabled: true,
@@ -144,6 +146,40 @@ export async function update(routed: RouterRouted) {
 
   // Ensure user can actually be found (Has not left, or not some other error)
   if (!discordUser) return false // Stop here
+
+  // Fetch all that have been mapped already
+  const alreadyMapped = await routed.bot.DB.getMultiple<TrackedServerSetting>('server-settings', { serverID: routed.message.guild.id, key: /^server\.ck\.roles/ })
+  // Already Mapped as Object
+  const alreadyMappedIDs = {
+    // Lockee
+    noviceLockeeX: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.1`),
+    noviceLockeeY: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.11`),
+    noviceLockeeZ: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.111`),
+    intermediateLockeeX: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.2`),
+    intermediateLockeeY: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.22`),
+    intermediateLockeeZ: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.222`),
+    experiencedLockeeX: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.3`),
+    experiencedLockeeY: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.33`),
+    experiencedLockeeZ: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.333`),
+    devotedLockeeX: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.4`),
+    devotedLockeeY: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.44`),
+    devotedLockeeZ: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.444`),
+    fanaticalLockeeX: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.5`),
+    fanaticalLockeeY: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.55`),
+    fanaticalLockeeZ: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.555`),
+    // Keyholder
+    noviceKeyholder: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.101`),
+    keyholder: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.102`),
+    establishedKeyholder: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.103`),
+    distinguishedKeyholder: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.104`),
+    renownedKeyholder: alreadyMapped.find((saved) => saved.key === `server.ck.roles.exp.105`),
+    // Specials
+    unlocked: alreadyMapped.find((saved) => saved.key === `server.ck.roles.special.1`),
+    locked: alreadyMapped.find((saved) => saved.key === `server.ck.roles.special.2`),
+    locktober2019: alreadyMapped.find((saved) => saved.key === `server.ck.roles.special.3`),
+    locktober2020: alreadyMapped.find((saved) => saved.key === `server.ck.roles.special.4`)
+  }
+
   // Server Roles
   const role: { [name: string]: Discord.Role } = {
     locked: undefined,
@@ -155,17 +191,23 @@ export async function update(routed: RouterRouted) {
     establishedKeyholder: undefined,
     keyholder: undefined,
     noviceKeyholder: undefined,
-    fanaticalLockeePink: undefined,
-    devotedLockeePink: undefined,
-    experiencedLockeePink: undefined,
-    intermediateLockeePink: undefined,
-    noviceLockeePink: undefined,
-    fanaticalLockeeBlue: undefined,
-    devotedLockeeBlue: undefined,
-    experiencedLockeeBlue: undefined,
-    intermediateLockeeBlue: undefined,
-    noviceLockeeBlue: undefined
+    fanaticalLockeeX: undefined,
+    devotedLockeeX: undefined,
+    experiencedLockeeX: undefined,
+    intermediateLockeeX: undefined,
+    noviceLockeeX: undefined,
+    fanaticalLockeeY: undefined,
+    devotedLockeeY: undefined,
+    experiencedLockeeY: undefined,
+    intermediateLockeeY: undefined,
+    noviceLockeeY: undefined,
+    fanaticalLockeeZ: undefined,
+    devotedLockeeZ: undefined,
+    experiencedLockeeZ: undefined,
+    intermediateLockeeZ: undefined,
+    noviceLockeeZ: undefined
   }
+
   // User Roles
   var discordUserHasRole = {
     locked: false,
@@ -177,117 +219,139 @@ export async function update(routed: RouterRouted) {
     establishedKeyholder: false,
     keyholder: false,
     noviceKeyholder: false,
-    fanaticalLockeePink: false,
-    devotedLockeePink: false,
-    experiencedLockeePink: false,
-    intermediateLockeePink: false,
-    noviceLockeePink: false,
-    fanaticalLockeeBlue: false,
-    devotedLockeeBlue: false,
-    experiencedLockeeBlue: false,
-    intermediateLockeeBlue: false,
-    noviceLockeeBlue: false
+    fanaticalLockeeX: false,
+    devotedLockeeX: false,
+    experiencedLockeeX: false,
+    intermediateLockeeX: false,
+    noviceLockeeX: false,
+    fanaticalLockeeY: false,
+    devotedLockeeY: false,
+    experiencedLockeeY: false,
+    intermediateLockeeY: false,
+    noviceLockeeY: false,
+    fanaticalLockeeZ: false,
+    devotedLockeeZ: false,
+    experiencedLockeeZ: false,
+    intermediateLockeeZ: false,
+    noviceLockeeZ: false
   }
 
   // Loop once finding roles for the above variables
   routed.message.guild.roles.cache.forEach((r) => {
-
-    if (r.id === '748483985801478224') role.locked = r
-    if (r.id === '748483991203479652') role.unlocked = r
-    if (r.id === '748481687289331762') role.locktober2019 = r
-    if (r.id === '748481692305588284') role.locktober2020 = r
-    if (r.id === '748473138915967016') role.renownedKeyholder = r
-    if (r.id === '748473271128686652') role.distinguishedKeyholder = r
-    if (r.id === '748473523265208392') role.establishedKeyholder = r
-    if (r.id === '748473817990430720') role.keyholder = r
-    if (r.id === '748473944990023681') role.noviceKeyholder = r
-  
-    if (r.id === '748474225849008169') role.fanaticalLockeePink = r
-    if (r.id === '748474093833158737') role.fanaticalLockeeBlue = r
-    if (r.id === '748474401862975540') role.devotedLockeePink = r
-    if (r.id === '748474317234241538') role.devotedLockeeBlue = r
-    if (r.id === '748474611544621140') role.experiencedLockeePink = r
-    if (r.id === '748474511988621426') role.experiencedLockeeBlue = r
-    if (r.id === '748474759070875699') role.intermediateLockeePink = r
-    if (r.id === '748474699851497482') role.intermediateLockeeBlue = r
-    if (r.id === '748474892533497877') role.noviceLockeePink = r
-    if (r.id === '748474888385331290') role.noviceLockeeBlue = r
+    if (alreadyMappedIDs.unlocked) if (r.id === alreadyMappedIDs.unlocked.value) role.unlocked = r
+    if (alreadyMappedIDs.locked) if (r.id === alreadyMappedIDs.locked.value) role.locked = r
+    if (alreadyMappedIDs.locktober2019) if (r.id === alreadyMappedIDs.locktober2019.value) role.locktober2019 = r
+    if (alreadyMappedIDs.locktober2020) if (r.id === alreadyMappedIDs.locktober2020.value) role.locktober2020 = r
+    // Keyholder
+    if (alreadyMappedIDs.renownedKeyholder) if (r.id === alreadyMappedIDs.renownedKeyholder.value) role.renownedKeyholder = r
+    if (alreadyMappedIDs.distinguishedKeyholder) if (r.id === alreadyMappedIDs.distinguishedKeyholder.value) role.distinguishedKeyholder = r
+    if (alreadyMappedIDs.establishedKeyholder) if (r.id === alreadyMappedIDs.establishedKeyholder.value) role.establishedKeyholder = r
+    if (alreadyMappedIDs.keyholder) if (r.id === alreadyMappedIDs.keyholder.value) role.keyholder = r
+    if (alreadyMappedIDs.noviceKeyholder) if (r.id === alreadyMappedIDs.noviceKeyholder.value) role.noviceKeyholder = r
+    // Lockee
+    if (alreadyMappedIDs.fanaticalLockeeX) if (r.id === alreadyMappedIDs.fanaticalLockeeX.value) role.fanaticalLockeeX = r
+    if (alreadyMappedIDs.fanaticalLockeeY) if (r.id === alreadyMappedIDs.fanaticalLockeeY.value) role.fanaticalLockeeY = r
+    if (alreadyMappedIDs.fanaticalLockeeZ) if (r.id === alreadyMappedIDs.fanaticalLockeeZ.value) role.fanaticalLockeeZ = r
+    if (alreadyMappedIDs.devotedLockeeX) if (r.id === alreadyMappedIDs.devotedLockeeX.value) role.devotedLockeeX = r
+    if (alreadyMappedIDs.devotedLockeeY) if (r.id === alreadyMappedIDs.devotedLockeeY.value) role.devotedLockeeY = r
+    if (alreadyMappedIDs.devotedLockeeZ) if (r.id === alreadyMappedIDs.devotedLockeeZ.value) role.devotedLockeeZ = r
+    if (alreadyMappedIDs.experiencedLockeeX) if (r.id === alreadyMappedIDs.experiencedLockeeX.value) role.experiencedLockeeX = r
+    if (alreadyMappedIDs.experiencedLockeeY) if (r.id === alreadyMappedIDs.experiencedLockeeY.value) role.experiencedLockeeY = r
+    if (alreadyMappedIDs.experiencedLockeeZ) if (r.id === alreadyMappedIDs.experiencedLockeeZ.value) role.experiencedLockeeZ = r
+    if (alreadyMappedIDs.intermediateLockeeX) if (r.id === alreadyMappedIDs.intermediateLockeeX.value) role.intermediateLockeeX = r
+    if (alreadyMappedIDs.intermediateLockeeY) if (r.id === alreadyMappedIDs.intermediateLockeeY.value) role.intermediateLockeeY = r
+    if (alreadyMappedIDs.intermediateLockeeZ) if (r.id === alreadyMappedIDs.intermediateLockeeZ.value) role.intermediateLockeeZ = r
+    if (alreadyMappedIDs.noviceLockeeX) if (r.id === alreadyMappedIDs.noviceLockeeX.value) role.noviceLockeeX = r
+    if (alreadyMappedIDs.noviceLockeeY) if (r.id === alreadyMappedIDs.noviceLockeeY.value) role.noviceLockeeY = r
+    if (alreadyMappedIDs.noviceLockeeZ) if (r.id === alreadyMappedIDs.noviceLockeeZ.value) role.noviceLockeeZ = r
   })
 
   discordUser.roles.cache.forEach((r) => {
-    if (r.id === '748483985801478224') discordUserHasRole.locked = true
-    if (r.id === '748483991203479652') discordUserHasRole.unlocked = true
-    if (r.id === '748481687289331762') discordUserHasRole.locktober2019 = true
-    if (r.id === '748481692305588284') discordUserHasRole.locktober2020 = true
-    if (r.id === '748473138915967016') discordUserHasRole.renownedKeyholder = true
-    if (r.id === '748473271128686652') discordUserHasRole.distinguishedKeyholder = true
-    if (r.id === '748473523265208392') discordUserHasRole.establishedKeyholder = true
-    if (r.id === '748473817990430720') discordUserHasRole.keyholder = true
-    if (r.id === '748473944990023681') discordUserHasRole.noviceKeyholder = true
-  
-    if (r.id === '748474225849008169') discordUserHasRole.fanaticalLockeePink = true
-    if (r.id === '748474093833158737') discordUserHasRole.fanaticalLockeeBlue = true
-    if (r.id === '748474401862975540') discordUserHasRole.devotedLockeePink = true
-    if (r.id === '748474317234241538') discordUserHasRole.devotedLockeeBlue = true
-    if (r.id === '748474611544621140') discordUserHasRole.experiencedLockeePink = true
-    if (r.id === '748474511988621426') discordUserHasRole.experiencedLockeeBlue = true
-    if (r.id === '748474759070875699') discordUserHasRole.intermediateLockeePink = true
-    if (r.id === '748474699851497482') discordUserHasRole.intermediateLockeeBlue = true
-    if (r.id === '748474892533497877') discordUserHasRole.noviceLockeePink = true
-    if (r.id === '748474888385331290') discordUserHasRole.noviceLockeeBlue = true
+    if (alreadyMappedIDs.unlocked) if (r.id === alreadyMappedIDs.unlocked.value) discordUserHasRole.unlocked = true
+    if (alreadyMappedIDs.locked) if (r.id === alreadyMappedIDs.locked.value) discordUserHasRole.locked = true
+    if (alreadyMappedIDs.locktober2019) if (r.id === alreadyMappedIDs.locktober2019.value) discordUserHasRole.locktober2019 = true
+    if (alreadyMappedIDs.locktober2020) if (r.id === alreadyMappedIDs.locktober2020.value) discordUserHasRole.locktober2020 = true
+    // Keyholder
+    if (alreadyMappedIDs.renownedKeyholder) if (r.id === alreadyMappedIDs.renownedKeyholder.value) discordUserHasRole.renownedKeyholder = true
+    if (alreadyMappedIDs.distinguishedKeyholder) if (r.id === alreadyMappedIDs.distinguishedKeyholder.value) discordUserHasRole.distinguishedKeyholder = true
+    if (alreadyMappedIDs.establishedKeyholder) if (r.id === alreadyMappedIDs.establishedKeyholder.value) discordUserHasRole.establishedKeyholder = true
+    if (alreadyMappedIDs.keyholder) if (r.id === alreadyMappedIDs.keyholder.value) discordUserHasRole.keyholder = true
+    if (alreadyMappedIDs.noviceKeyholder) if (r.id === alreadyMappedIDs.noviceKeyholder.value) discordUserHasRole.noviceKeyholder = true
+    // Lockee
+    if (alreadyMappedIDs.fanaticalLockeeX) if (r.id === alreadyMappedIDs.fanaticalLockeeX.value) discordUserHasRole.fanaticalLockeeX = true
+    if (alreadyMappedIDs.fanaticalLockeeY) if (r.id === alreadyMappedIDs.fanaticalLockeeY.value) discordUserHasRole.fanaticalLockeeY = true
+    if (alreadyMappedIDs.fanaticalLockeeZ) if (r.id === alreadyMappedIDs.fanaticalLockeeZ.value) discordUserHasRole.fanaticalLockeeZ = true
+    if (alreadyMappedIDs.devotedLockeeX) if (r.id === alreadyMappedIDs.devotedLockeeX.value) discordUserHasRole.devotedLockeeX = true
+    if (alreadyMappedIDs.devotedLockeeY) if (r.id === alreadyMappedIDs.devotedLockeeY.value) discordUserHasRole.devotedLockeeY = true
+    if (alreadyMappedIDs.devotedLockeeZ) if (r.id === alreadyMappedIDs.devotedLockeeZ.value) discordUserHasRole.devotedLockeeZ = true
+    if (alreadyMappedIDs.experiencedLockeeX) if (r.id === alreadyMappedIDs.experiencedLockeeX.value) discordUserHasRole.experiencedLockeeX = true
+    if (alreadyMappedIDs.experiencedLockeeY) if (r.id === alreadyMappedIDs.experiencedLockeeY.value) discordUserHasRole.experiencedLockeeY = true
+    if (alreadyMappedIDs.experiencedLockeeZ) if (r.id === alreadyMappedIDs.experiencedLockeeZ.value) discordUserHasRole.experiencedLockeeZ = true
+    if (alreadyMappedIDs.intermediateLockeeX) if (r.id === alreadyMappedIDs.intermediateLockeeX.value) discordUserHasRole.intermediateLockeeX = true
+    if (alreadyMappedIDs.intermediateLockeeY) if (r.id === alreadyMappedIDs.intermediateLockeeY.value) discordUserHasRole.intermediateLockeeY = true
+    if (alreadyMappedIDs.intermediateLockeeZ) if (r.id === alreadyMappedIDs.intermediateLockeeZ.value) discordUserHasRole.intermediateLockeeZ = true
+    if (alreadyMappedIDs.noviceLockeeX) if (r.id === alreadyMappedIDs.noviceLockeeX.value) discordUserHasRole.noviceLockeeX = true
+    if (alreadyMappedIDs.noviceLockeeY) if (r.id === alreadyMappedIDs.noviceLockeeY.value) discordUserHasRole.noviceLockeeY = true
+    if (alreadyMappedIDs.noviceLockeeZ) if (r.id === alreadyMappedIDs.noviceLockeeZ.value) discordUserHasRole.noviceLockeeZ = true
   })
 
-  // Determine which color the user prefers, blue or pink
+  // Determine which color the user prefers, Y or X
   var userHasPref = false
   var isChangingLockeeExpRole = false
-  const prefPink =
-    discordUserHasRole.devotedLockeePink || discordUserHasRole.experiencedLockeePink || discordUserHasRole.intermediateLockeePink || discordUserHasRole.noviceLockeePink
-  const prefBlue =
-    discordUserHasRole.devotedLockeeBlue || discordUserHasRole.experiencedLockeeBlue || discordUserHasRole.intermediateLockeeBlue || discordUserHasRole.noviceLockeeBlue
+  const prefX =
+    discordUserHasRole.fanaticalLockeeX ||
+    discordUserHasRole.devotedLockeeX ||
+    discordUserHasRole.experiencedLockeeX ||
+    discordUserHasRole.intermediateLockeeX ||
+    discordUserHasRole.noviceLockeeX
+  const prefY = discordUserHasRole.fanaticalLockeeY || discordUserHasRole.experiencedLockeeY || discordUserHasRole.intermediateLockeeY || discordUserHasRole.noviceLockeeY
+  const prefZ = discordUserHasRole.fanaticalLockeeZ || discordUserHasRole.experiencedLockeeZ || discordUserHasRole.intermediateLockeeZ || discordUserHasRole.noviceLockeeZ
 
   // Ensure user has a color preference already selected, otherwise don't pick one
-  if (prefBlue || prefPink) userHasPref = true
+  if (prefY || prefX || prefZ) userHasPref = true
 
   // Cumulative time locked
   const cumulativeTimeLockedMonths = Math.round((lockeeData.data.cumulativeSecondsLocked / 2592000) * 100) / 100
 
   ///////////////////////////////////////
-  /// Role Update: Locked || Unlocked ///
+  /// Role Update: Locked || Unlocked ///\
   ///////////////////////////////////////
   // console.log('userHasPref:', userHasPref)
   // console.log('discordUserHasRole.unlocked:', discordUserHasRole.unlocked)
   // console.log('discordUserHasRole.locked:', discordUserHasRole.locked)
-  try {
-    if (userHasPref || discordUserHasRole.unlocked || discordUserHasRole.locked) {
-      // When there are locks Locked or not yet unlocked: set the locked role
-      if (hasLockedLock.length > 0) {
-        // Remove any unlocked role if user has it
-        if (discordUserHasRole.unlocked) {
-          await discordUser.roles.remove(role.unlocked)
-          changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: 'Unlocked' })
+  if (role.unlocked || role.locked) {
+    try {
+      if (userHasPref || discordUserHasRole.unlocked || discordUserHasRole.locked) {
+        // When there are locks Locked or not yet unlocked: set the locked role
+        if (hasLockedLock.length > 0) {
+          // Remove any unlocked role if user has it
+          if (discordUserHasRole.unlocked) {
+            await discordUser.roles.remove(role.unlocked)
+            changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: role.unlocked.name })
+          }
+          // Add locked role (If not already set)
+          if (!discordUserHasRole.locked) {
+            await discordUser.roles.add(role.locked)
+            changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.locked.name })
+          }
         }
-        // Add locked role (If not already set)
-        if (!discordUserHasRole.locked) {
-          await discordUser.roles.add(role.locked)
-          changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: 'Locked' })
+        // Else: Set unlocked role & remove any locked role if they have
+        else {
+          // Remove any locked role if user has it
+          if (discordUserHasRole.locked) {
+            await discordUser.roles.remove(role.locked)
+            changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: role.locked.name })
+          }
+          // Add unlocked role (If not already set)
+          if (!discordUserHasRole.unlocked) {
+            await discordUser.roles.add(role.unlocked)
+            changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.unlocked.name })
+          }
         }
       }
-      // Else: Set unlocked role & remove any locked role if they have
-      else {
-        // Remove any locked role if user has it
-        if (discordUserHasRole.locked) {
-          await discordUser.roles.remove(role.locked)
-          changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: 'Locked' })
-        }
-        // Add unlocked role (If not already set)
-        if (!discordUserHasRole.unlocked) {
-          await discordUser.roles.add(role.unlocked)
-          changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: 'Unlocked' })
-        }
-      }
+    } catch (e) {
+      console.log('CK Update Error updating Locked/Unlocked role')
     }
-  } catch (e) {
-    console.log('CK Update Error updating Locked/Unlocked role')
   }
 
   ///////////////////////////////////////
@@ -299,136 +363,168 @@ export async function update(routed: RouterRouted) {
   // Intermediate =  2
   // Novice       =  0
   try {
-    const rolesToRemove = [] as Array<{ role: string; name: string }>
+    const rolesToRemove = [] as Array<{ role: string }>
 
     // Devoted
     if (cumulativeTimeLockedMonths >= 24 && userHasPref) {
       // Add Proper Fanatical role
-      if (!discordUserHasRole.fanaticalLockeePink && prefPink) {
+      if (!discordUserHasRole.fanaticalLockeeX && prefX) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.fanaticalLockeePink)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Pink) Fanatical Lockee' })
+        await discordUser.roles.add(role.fanaticalLockeeX)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.fanaticalLockeeX.name })
       }
-      if (!discordUserHasRole.fanaticalLockeeBlue && prefBlue) {
+      if (!discordUserHasRole.fanaticalLockeeY && prefY) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.fanaticalLockeeBlue)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Blue) Fanatical Lockee' })
+        await discordUser.roles.add(role.fanaticalLockeeY)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.fanaticalLockeeY.name })
+      }
+      if (!discordUserHasRole.fanaticalLockeeZ && prefZ) {
+        isChangingLockeeExpRole = true
+        await discordUser.roles.add(role.fanaticalLockeeZ)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.fanaticalLockeeZ.name })
       }
 
       // Remove other roles
-      if (isChangingLockeeExpRole) {
-        rolesToRemove.push(
-          { role: 'devotedLockeePink', name: '(Pink) Devoted Lockee' },
-          { role: 'devotedLockeeBlue', name: '(Blue) Devoted Lockee' },
-          { role: 'experiencedLockeePink', name: '(Pink) Experienced Lockee' },
-          { role: 'experiencedLockeeBlue', name: '(Blue) Experienced Lockee' },
-          { role: 'intermediateLockeePink', name: '(Pink) Intermediate Lockee' },
-          { role: 'intermediateLockeeBlue', name: '(Blue) Intermediate Lockee' },
-          { role: 'noviceLockeePink', name: '(Pink) Novice Lockee' },
-          { role: 'noviceLockeeBlue', name: '(Blue) Novice Lockee' }
-        )
-      }
+      rolesToRemove.push(
+        { role: 'devotedLockeeX' },
+        { role: 'devotedLockeeY' },
+        { role: 'devotedLockeeZ' },
+        { role: 'experiencedLockeeX' },
+        { role: 'experiencedLockeeY' },
+        { role: 'experiencedLockeeZ' },
+        { role: 'intermediateLockeeX' },
+        { role: 'intermediateLockeeY' },
+        { role: 'intermediateLockeeZ' },
+        { role: 'noviceLockeeX' },
+        { role: 'noviceLockeeY' },
+        { role: 'noviceLockeeZ' }
+      )
     }
 
     // Devoted
     if (cumulativeTimeLockedMonths >= 12 && cumulativeTimeLockedMonths < 24 && userHasPref) {
       // Add Proper Devoted role
-      if (!discordUserHasRole.devotedLockeePink && prefPink) {
+      if (!discordUserHasRole.devotedLockeeX && prefX) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.devotedLockeePink)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Pink) Lockee Lvl 4' })
+        await discordUser.roles.add(role.devotedLockeeX)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.devotedLockeeX.name })
       }
-      if (!discordUserHasRole.devotedLockeeBlue && prefBlue) {
+      if (!discordUserHasRole.devotedLockeeY && prefY) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.devotedLockeeBlue)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Blue) Lockee Lvl 4' })
+        await discordUser.roles.add(role.devotedLockeeY)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.devotedLockeeY.name })
+      }
+      if (!discordUserHasRole.devotedLockeeZ && prefZ) {
+        isChangingLockeeExpRole = true
+        await discordUser.roles.add(role.devotedLockeeZ)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.devotedLockeeZ.name })
       }
 
       // Remove other roles
-      if (isChangingLockeeExpRole) {
-
-        rolesToRemove.push(
-          { role: 'devotedLockeePink', name: '(Pink) Lockee Lvl 4' },
-          { role: 'devotedLockeeBlue', name: '(Blue) Lockee Lvl 4' },
-          { role: 'experiencedLockeePink', name: '(Pink) Lockee Lvl 3' },
-          { role: 'experiencedLockeeBlue', name: '(Blue) Lockee Lvl 3' },
-          { role: 'intermediateLockeePink', name: '(Pink) Lockee Lvl 2' },
-          { role: 'intermediateLockeeBlue', name: '(Blue) Lockee Lvl 2' },
-          { role: 'noviceLockeePink', name: '(Pink) Lockee Lvl 1' },
-          { role: 'noviceLockeeBlue', name: '(Blue) Lockee Lvl 1' }
-        )
-      }
+      rolesToRemove.push(
+        { role: 'fanaticalLockeeX' },
+        { role: 'fanaticalLockeeY' },
+        { role: 'fanaticalLockeeZ' },
+        { role: 'experiencedLockeeX' },
+        { role: 'experiencedLockeeY' },
+        { role: 'experiencedLockeeZ' },
+        { role: 'intermediateLockeeX' },
+        { role: 'intermediateLockeeY' },
+        { role: 'intermediateLockeeZ' },
+        { role: 'noviceLockeeX' },
+        { role: 'noviceLockeeY' },
+        { role: 'noviceLockeeZ' }
+      )
     }
 
     // Experienced
     if (cumulativeTimeLockedMonths >= 6 && cumulativeTimeLockedMonths < 12 && userHasPref) {
       // Add Proper Experienced role
-      if (!discordUserHasRole.experiencedLockeePink && prefPink) {
+      if (!discordUserHasRole.experiencedLockeeX && prefX) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.experiencedLockeePink)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Pink) Lockee Lvl 3' })
+        await discordUser.roles.add(role.experiencedLockeeX)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.experiencedLockeeX.name })
       }
-      if (!discordUserHasRole.experiencedLockeeBlue && prefBlue) {
+      if (!discordUserHasRole.experiencedLockeeY && prefY) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.experiencedLockeeBlue)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Blue) Lockee Lvl 3' })
+        await discordUser.roles.add(role.experiencedLockeeY)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.experiencedLockeeY.name })
+      }
+      if (!discordUserHasRole.experiencedLockeeZ && prefZ) {
+        isChangingLockeeExpRole = true
+        await discordUser.roles.add(role.experiencedLockeeZ)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.experiencedLockeeZ.name })
       }
 
       // Remove other roles
-      if (isChangingLockeeExpRole) {
-        rolesToRemove.push(
-          { role: 'devotedLockeePink', name: '(Pink) Lockee Lvl 4' },
-          { role: 'devotedLockeeBlue', name: '(Blue) Lockee Lvl 4' },
-          { role: 'experiencedLockeePink', name: '(Pink) Lockee Lvl 3' },
-          { role: 'experiencedLockeeBlue', name: '(Blue) Lockee Lvl 3' },
-          { role: 'intermediateLockeePink', name: '(Pink) Lockee Lvl 2' },
-          { role: 'intermediateLockeeBlue', name: '(Blue) Lockee Lvl 2' },
-          { role: 'noviceLockeePink', name: '(Pink) Lockee Lvl 1' },
-          { role: 'noviceLockeeBlue', name: '(Blue) Lockee Lvl 1' }
-        )
-      }
+      rolesToRemove.push(
+        { role: 'fanaticalLockeeX' },
+        { role: 'fanaticalLockeeY' },
+        { role: 'fanaticalLockeeZ' },
+        { role: 'devotedLockeeX' },
+        { role: 'devotedLockeeY' },
+        { role: 'devotedLockeeZ' },
+        { role: 'intermediateLockeeX' },
+        { role: 'intermediateLockeeY' },
+        { role: 'intermediateLockeeZ' },
+        { role: 'noviceLockeeX' },
+        { role: 'noviceLockeeY' },
+        { role: 'noviceLockeeZ' }
+      )
     }
 
     // Intermediate
     if (cumulativeTimeLockedMonths >= 2 && cumulativeTimeLockedMonths < 6 && userHasPref) {
       // Add Proper Intermediate role
-      if (!discordUserHasRole.intermediateLockeePink && prefPink) {
+      if (!discordUserHasRole.intermediateLockeeX && prefX) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.intermediateLockeePink)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Pink) Lockee Lvl 2' })
+        await discordUser.roles.add(role.intermediateLockeeX)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.intermediateLockeeX.name })
       }
-      if (!discordUserHasRole.intermediateLockeeBlue && prefBlue) {
+      if (!discordUserHasRole.intermediateLockeeY && prefY) {
         isChangingLockeeExpRole = true
-        await discordUser.roles.add(role.intermediateLockeeBlue)
-        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: '(Blue) Lockee Lvl 2' })
+        await discordUser.roles.add(role.intermediateLockeeY)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.intermediateLockeeY.name })
+      }
+      if (!discordUserHasRole.intermediateLockeeZ && prefZ) {
+        isChangingLockeeExpRole = true
+        await discordUser.roles.add(role.intermediateLockeeZ)
+        changesImplemented.push({ action: 'added', category: 'lockee', type: 'role', result: role.intermediateLockeeZ.name })
       }
 
       // Remove other roles
-      if (isChangingLockeeExpRole) {
-        rolesToRemove.push(
-          { role: 'devotedLockeePink', name: '(Pink) Lockee Lvl 4' },
-          { role: 'devotedLockeeBlue', name: '(Blue) Lockee Lvl 4' },
-          { role: 'experiencedLockeePink', name: '(Pink) Lockee Lvl 3' },
-          { role: 'experiencedLockeeBlue', name: '(Blue) Lockee Lvl 3' },
-          { role: 'intermediateLockeePink', name: '(Pink) Lockee Lvl 2' },
-          { role: 'intermediateLockeeBlue', name: '(Blue) Lockee Lvl 2' },
-          { role: 'noviceLockeePink', name: '(Pink) Lockee Lvl 1' },
-          { role: 'noviceLockeeBlue', name: '(Blue) Lockee Lvl 1' }
-        )
-      }
+      rolesToRemove.push(
+        { role: 'fanaticalLockeeX' },
+        { role: 'fanaticalLockeeY' },
+        { role: 'fanaticalLockeeZ' },
+        { role: 'devotedLockeeX' },
+        { role: 'devotedLockeeY' },
+        { role: 'devotedLockeeZ' },
+        { role: 'experiencedLockeeX' },
+        { role: 'experiencedLockeeY' },
+        { role: 'experiencedLockeeZ' },
+        { role: 'noviceLockeeX' },
+        { role: 'noviceLockeeY' },
+        { role: 'noviceLockeeZ' }
+      )
     }
 
     // Removal Step
     for (let index = 0; index < rolesToRemove.length; index++) {
       const roleForRemoval = rolesToRemove[index]
-      // Ensure user has role before attempting to remove
-      if (discordUserHasRole[roleForRemoval.role]) {
-        await discordUser.roles.remove(role[roleForRemoval.role])
-        changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: roleForRemoval.name })
-      }
+      // Check to be sure all are mapped before trying to process, to prevent any error
+      // console.log('checking role for removal', roleForRemoval.role, role[roleForRemoval.role])
+      if (role[roleForRemoval.role]) {
+        // Ensure user has role before attempting to remove
+        if (discordUserHasRole[roleForRemoval.role]) {
+          console.log('--> Removing Role:', role[roleForRemoval.role].name, 'From:', discordUser.id)
+          await discordUser.roles.remove(role[roleForRemoval.role])
+          changesImplemented.push({ action: 'removed', category: 'lockee', type: 'role', result: role[roleForRemoval.role].name })
+        }
+      } // else console.log('## Role has not been mapped', roleForRemoval)
     }
   } catch (e) {
-    console.log('CK Update Error updating Experience role')
+    console.log('CK Update Error updating Experience role', e)
   }
   // * Performance End: Lockee * //
   updatePerformance.lockee.end = performance.now()
@@ -437,59 +533,61 @@ export async function update(routed: RouterRouted) {
   ///////////////////////////////////////
   /// Role Update: Locktober          ///
   ///////////////////////////////////////
-  // * Performance Start: Locktober * //
-  updatePerformance.locktober.start = performance.now()
-  changesImplemented.push({ action: 'header', category: 'n/a', type: 'status', result: 'Locktober' })
+  if (role.locktober2020 || role.locktober2019) {
+    // * Performance Start: Locktober * //
+    updatePerformance.locktober.start = performance.now()
+    changesImplemented.push({ action: 'header', category: 'n/a', type: 'status', result: 'Locktober' })
 
-  try {
-    // Locktober Data (DB Cached)
-    const isLocktoberParticipant2019 = await routed.bot.DB.verify<{ username: string; discordID: string }>('ck-locktober-2019', { discordID: user.id })
-    const isLocktoberParticipant2020 = await routed.bot.DB.verify<{ username: string; discordID: string }>('ck-locktober-2020', { discordID: user.id })
+    try {
+      // Locktober Data (DB Cached)
+      const isLocktoberParticipant2019 = await routed.bot.DB.verify<{ username: string; discordID: string }>('ck-locktober-2019', { discordID: user.id })
+      const isLocktoberParticipant2020 = await routed.bot.DB.verify<{ username: string; discordID: string }>('ck-locktober-2020', { discordID: user.id })
 
-    // * 2019 * //
-    if (isLocktoberParticipant2019) {
-      // User is found in participants list, is missing the role, add the role
-      if (!discordUserHasRole.locktober2019) {
-        await discordUser.roles.add(role.locktober2019)
-        changesImplemented.push({ action: 'added', category: 'locktober', type: 'role', result: 'Locktober 2019' })
+      // * 2019 * //
+      if (isLocktoberParticipant2019) {
+        // User is found in participants list, is missing the role, add the role
+        if (!discordUserHasRole.locktober2019) {
+          await discordUser.roles.add(role.locktober2019)
+          changesImplemented.push({ action: 'added', category: 'locktober', type: 'role', result: role.locktober2019.name })
+        }
       }
-    }
-    // Else: User is not longer in the participants list
-    else {
-      // User is NOT found in participants list, remove the role
-      if (discordUserHasRole.locktober2019) {
-        await discordUser.roles.remove(role.locktober2019)
-        changesImplemented.push({ action: 'removed', category: 'locktober', type: 'role', result: 'Locktober 2019' })
+      // Else: User is not longer in the participants list
+      else {
+        // User is NOT found in participants list, remove the role
+        if (discordUserHasRole.locktober2019) {
+          await discordUser.roles.remove(role.locktober2019)
+          changesImplemented.push({ action: 'removed', category: 'locktober', type: 'role', result: role.locktober2019.name })
+        }
       }
-    }
 
-    // * 2020 * //
-    if (isLocktoberParticipant2020) {
-      // User is found in participants list, is missing the role, add the role
-      if (!discordUserHasRole.locktober2020) {
-        await discordUser.roles.add(role.locktober2020)
-        changesImplemented.push({ action: 'added', category: 'locktober', type: 'role', result: 'Locktober 2020' })
+      // * 2020 * //
+      if (isLocktoberParticipant2020) {
+        // User is found in participants list, is missing the role, add the role
+        if (!discordUserHasRole.locktober2020) {
+          await discordUser.roles.add(role.locktober2020)
+          changesImplemented.push({ action: 'added', category: 'locktober', type: 'role', result: role.locktober2020.name })
+        }
       }
-    }
-    // Else: User is not longer in the participants list
-    else {
-      // User is NOT found in participants list, remove the role
-      if (discordUserHasRole.locktober2020) {
-        await discordUser.roles.remove(role.locktober2020)
-        changesImplemented.push({ action: 'removed', category: 'locktober', type: 'role', result: 'Locktober 2020' })
+      // Else: User is not longer in the participants list
+      else {
+        // User is NOT found in participants list, remove the role
+        if (discordUserHasRole.locktober2020) {
+          await discordUser.roles.remove(role.locktober2020)
+          changesImplemented.push({ action: 'removed', category: 'locktober', type: 'role', result: role.locktober2020.name })
+        }
       }
+    } catch (e) {
+      console.log('CK Update Error updating Locktober role(s)', e)
     }
-  } catch (e) {
-    console.log('CK Update Error updating Locktober role(s)', e)
+    // * Performance End: Locktober * //
+    updatePerformance.locktober.end = performance.now()
+    changesImplemented.push({
+      action: 'performance',
+      category: 'n/a',
+      type: 'status',
+      result: `${Math.round(updatePerformance.locktober.end - updatePerformance.locktober.start)}ms`
+    })
   }
-  // * Performance End: Locktober * //
-  updatePerformance.locktober.end = performance.now()
-  changesImplemented.push({
-    action: 'performance',
-    category: 'n/a',
-    type: 'status',
-    result: `${Math.round(updatePerformance.locktober.end - updatePerformance.locktober.start)}ms`
-  })
 
   ///////////////////////////////////////
   /// Nickname Update                 ///
@@ -565,11 +663,11 @@ export async function update(routed: RouterRouted) {
       // Distinguished Keyholder -> Renowned Keyholder role
       if (eligibleUpgradeDistinguishedToRenowned) {
         await discordUser.roles.add(role.renownedKeyholder)
-        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 5' })
+        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: role.renownedKeyholder.name })
 
         // Print in Audit log
         await routed.bot.channel.auditLog.send(
-          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`Renowned Keyholder\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
+          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`${role.renownedKeyholder.name}\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
             discordUser.nickname || discordUser.user.username
           }#${discordUser.user.discriminator}\``
         )
@@ -577,30 +675,30 @@ export async function update(routed: RouterRouted) {
         // Remove other roles
         if (discordUserHasRole.distinguishedKeyholder) {
           await discordUser.roles.remove(role.distinguishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 4' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.distinguishedKeyholder.name })
         }
         if (discordUserHasRole.establishedKeyholder) {
           await discordUser.roles.remove(role.establishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 3' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.establishedKeyholder.name })
         }
         if (discordUserHasRole.keyholder) {
           await discordUser.roles.remove(role.keyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 2' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.keyholder.name })
         }
         if (discordUserHasRole.noviceKeyholder) {
           await discordUser.roles.remove(role.noviceKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 1' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.noviceKeyholder.name })
         }
       }
 
       // Established Keyholder -> Distinguished Keyholder role
       if (eligibleUpgradeEstablishedToDistinguished) {
         await discordUser.roles.add(role.distinguishedKeyholder)
-        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 4' })
+        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: role.distinguishedKeyholder.name })
 
         // Print in Audit log
         await routed.bot.channel.auditLog.send(
-          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`Distinguished Keyholder\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
+          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`${role.distinguishedKeyholder.name}\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
             discordUser.nickname || discordUser.user.username
           }#${discordUser.user.discriminator}\``
         )
@@ -608,30 +706,30 @@ export async function update(routed: RouterRouted) {
         // Remove other roles
         if (discordUserHasRole.renownedKeyholder) {
           await discordUser.roles.remove(role.renownedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 5' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.renownedKeyholder.name })
         }
         if (discordUserHasRole.establishedKeyholder) {
           await discordUser.roles.remove(role.establishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 3' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.establishedKeyholder.name })
         }
         if (discordUserHasRole.keyholder) {
           await discordUser.roles.remove(role.keyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 2' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.keyholder.name })
         }
         if (discordUserHasRole.noviceKeyholder) {
           await discordUser.roles.remove(role.noviceKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 1' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.noviceKeyholder.name })
         }
       }
 
       // Keyholder -> Established Keyholder role
       if (eligibleUpgradeKeyholderToEstablished) {
         await discordUser.roles.add(role.establishedKeyholder)
-        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 3' })
+        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: role.establishedKeyholder.name })
 
         // Print in Audit log
         await routed.bot.channel.auditLog.send(
-          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`Established Keyholder\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
+          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`${role.establishedKeyholder.name}\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
             discordUser.nickname || discordUser.user.username
           }#${discordUser.user.discriminator}\``
         )
@@ -639,30 +737,30 @@ export async function update(routed: RouterRouted) {
         // Remove other roles
         if (discordUserHasRole.renownedKeyholder) {
           await discordUser.roles.remove(role.renownedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 5' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.renownedKeyholder.name })
         }
         if (discordUserHasRole.distinguishedKeyholder) {
           await discordUser.roles.remove(role.distinguishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 4' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.distinguishedKeyholder.name })
         }
         if (discordUserHasRole.keyholder) {
           await discordUser.roles.remove(role.keyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 2' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.keyholder.name })
         }
         if (discordUserHasRole.noviceKeyholder) {
           await discordUser.roles.remove(role.noviceKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 1' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.noviceKeyholder.name })
         }
       }
 
       // Novice -> Keyholder role
       if (eligibleUpgradeNoviceToKeyholder) {
         await discordUser.roles.add(role.keyholder)
-        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 2' })
+        changesImplemented.push({ action: 'added', category: 'keyholder', type: 'role', result: role.keyholder.name })
 
         // Print in Audit log
         await routed.bot.channel.auditLog.send(
-          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`Keyholder\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
+          `:robot: **ChastiKey Keyholder Level Up**\nUpgraded to = \`${role.keyholder.name}\`\nServer = \`${discordUser.guild.name}\`\nTo = \`@${
             discordUser.nickname || discordUser.user.username
           }#${discordUser.user.discriminator}\``
         )
@@ -670,24 +768,24 @@ export async function update(routed: RouterRouted) {
         // Remove other roles
         if (discordUserHasRole.renownedKeyholder) {
           await discordUser.roles.remove(role.renownedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 5' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.renownedKeyholder.name })
         }
         if (discordUserHasRole.distinguishedKeyholder) {
           await discordUser.roles.remove(role.distinguishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 4' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.distinguishedKeyholder.name })
         }
         if (discordUserHasRole.establishedKeyholder) {
           await discordUser.roles.remove(role.establishedKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 3' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.establishedKeyholder.name })
         }
         if (discordUserHasRole.noviceKeyholder) {
           await discordUser.roles.remove(role.noviceKeyholder)
-          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: 'Keyholder Lvl 1' })
+          changesImplemented.push({ action: 'removed', category: 'keyholder', type: 'role', result: role.noviceKeyholder.name })
         }
       }
     }
   } catch (e) {
-    console.log('CK Update Error updating Keyholder Exp role(s)')
+    console.log('CK Update Error updating Keyholder Exp role(s)', e)
   }
   // * Performance End: Keyholder * //
   updatePerformance.keyholder.end = performance.now()

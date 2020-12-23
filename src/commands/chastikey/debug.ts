@@ -16,10 +16,7 @@ export const Routes = ExportRoutes({
     defaultEnabled: true,
     serverOnly: true,
     restrictedTo: [
-      '715198203598864485',
-            '705412678142656655',
-            '448856044840550403',
-			'599298618603601951'
+      '715198203598864485'
     ]
   }
 })

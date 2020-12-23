@@ -6,7 +6,10 @@ import { WebRouted, WebRoute } from '@/api/web-router'
 import { CommandPermission } from '@/objects/permission'
 import { ObjectID } from 'bson'
 import { sb } from '@/utils'
-import { TrackedAvailableObject } from '@/objects/available-objects'
+import { TrackedServer } from '@/objects/server'
+import { TrackedServerSetting } from '@/objects/server-setting'
+
+const GLOBAL_PREFIX = process.env.BOT_MESSAGE_PREFIX
 
 export const Routes: Array<WebRoute> = [
   {
@@ -47,6 +50,9 @@ export async function getAll(routed: WebRouted) {
   // this.DEBUG_WEBAPI('req params', v.o)
 
   if (v.valid) {
+    const server = await routed.Bot.DB.get<TrackedServer>('servers', { id: v.o.serverID })
+    const prefix = server.prefix || GLOBAL_PREFIX
+
     // Get the same routes the router loader uses
     const routes = routed.Bot.Router.routes
     var query: any = {
@@ -54,7 +60,7 @@ export async function getAll(routed: WebRouted) {
     }
 
     // Check ChastiKey enabled state in db
-    var ckEnabledState = (await routed.Bot.DB.get<TrackedAvailableObject>('server-settings', {
+    var ckEnabledState = (await routed.Bot.DB.get<TrackedServerSetting>('server-settings', {
       serverID: v.o.serverID,
       key: 'server.chastikey.enabled',
       state: true
@@ -87,7 +93,7 @@ export async function getAll(routed: WebRouted) {
       const matchingRoute = routes.find((r) => r.name === p.command)
       if (matchingRoute) {
         // console.log(matchingRoute)
-        p.example = sb(matchingRoute.example)
+        p.example = sb(matchingRoute.example, { prefix })
         p.category = matchingRoute.category
       }
     })

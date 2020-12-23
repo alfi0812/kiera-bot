@@ -1,8 +1,8 @@
-import * as Middleware from '@/middleware'
 import { performance } from 'perf_hooks'
 import { RouterRouted, ExportRoutes } from '@/router'
 import { TrackedMessage } from '@/objects/message'
 import { pongResponse } from '@/embedded/ping-pong'
+import { TrackedBotSetting } from '@/objects/setting'
 
 export const Routes = ExportRoutes(
   {
@@ -30,7 +30,7 @@ export const Routes = ExportRoutes(
     category: 'Admin',
     controller: forceRestart,
     description: 'Help.Admin.BotRestart.Description',
-    example: '{{prefix}}restart bot',
+    example: '{{prefix}}admin restart bot',
     name: 'root-restart-bot',
     permissions: {
       restricted: true,
@@ -40,8 +40,22 @@ export const Routes = ExportRoutes(
             '448856044840550403'
       ]
     },
-    validate: '/admin:string/restart:string/bot:string/seconds?=number',
-    middleware: [Middleware.hasRole('developer')]
+    validate: '/admin:string/restart:string/bot:string/seconds?=number'
+  },
+  {
+    type: 'message',
+    category: 'Admin',
+    controller: setStatus,
+    description: 'Help.Admin.SetStatus.Description',
+    example: '{{prefix}}admin bot status message "Message Here"',
+    name: 'root-status-bot',
+    permissions: {
+      restricted: true,
+      restrictedTo: [
+        '715198203598864485' 
+      ]
+    },
+    validate: '/admin:string/bot:string/status:string/message:string/text=string'
   }
 )
 
@@ -110,5 +124,20 @@ export async function forceRestart(routed: RouterRouted) {
   }, routed.v.o.seconds || 5000)
 
   // Successful end
+  return true
+}
+
+export async function setStatus(routed: RouterRouted) {
+  // Store status in db in the event of a restart
+  await routed.bot.DB.update(
+    'settings',
+    { key: 'bot.status.message' },
+    new TrackedBotSetting({ added: Date.now(), author: routed.message.author.id, env: '*', key: 'bot.status.message', value: routed.v.o.text, updated: Date.now() }),
+    { upsert: true }
+  )
+
+  // Set the status
+  await routed.bot.client.user.setPresence({ activity: { name: routed.v.o.text || '' }, status: 'online' })
+
   return true
 }

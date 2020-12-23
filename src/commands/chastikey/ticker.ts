@@ -54,7 +54,8 @@ export const Routes = ExportRoutes(
     description: 'Help.ChastiKey.Ticker.Description',
     example: '{{prefix}}ck ticker',
     name: 'ck-get-ticker',
-    validate: '/ck:string/ticker:string/type?=number',
+    validate: '/ck:string/ticker:string/typeOrUser?=string/type?=number/date?=string',
+    validateAlias: ['/ck:string/t:string/typeOrUser?=string/type?=number/date?=string'],
     middleware: [Middleware.isCKVerified],
     permissions: {
       defaultEnabled: false,
@@ -101,7 +102,7 @@ export async function setTickerType(routed: RouterRouted) {
   const updateResult = await routed.bot.DB.update('users', { id: routed.author.id }, user)
 
   if (updateResult > 0) {
-    await routed.message.author.send(`:white_check_mark: ChastiKey Ticker type now set to: \`${newTickerTypeAsString}\``)
+    await routed.message.reply(`:white_check_mark: ChastiKey Ticker type now set to: \`${newTickerTypeAsString}\``)
     routed.bot.Log.Command.log(`{{prefix}}ck ticker set type ${newTickerTypeAsString}`)
     return true
   } else {
@@ -115,12 +116,12 @@ export async function setTickerDate(routed: RouterRouted) {
   if (/([0-9]{4}-[0-9]{2}-[0-9]{2})/.test(routed.v.o.number)) {
     await routed.bot.DB.update('users', { id: routed.author.id }, { $set: { 'ChastiKey.ticker.date': routed.v.o.number } }, { atomic: true })
 
-    await routed.message.author.send(`:white_check_mark: ChastiKey Start Date now set to: \`${routed.v.o.number}\``)
+    await routed.message.reply(`:white_check_mark: ChastiKey Start Date now set to: \`${routed.v.o.number}\``)
     routed.bot.Log.Command.log(`{{prefix}}ck ticker set date ${routed.v.o.number}`)
 
     return true
   } else {
-    await routed.message.author.send(`Failed to set ChastiKey Start Date format must be like: \`2019-01-26\``)
+    await routed.message.reply(`Failed to set ChastiKey Start Date format must be like: \`2019-01-26\``)
     routed.bot.Log.Command.log(`{{prefix}}ck ticker set date ${routed.v.o.number}`)
 
     return true
@@ -150,38 +151,61 @@ export async function setTickerRatingDisplay(routed: RouterRouted) {
 }
 
 export async function getTicker(routed: RouterRouted) {
+  // Was a username passed
+  const is1stPassed = routed.v.o.typeOrUser !== undefined
+  const is1stInt = Number.isInteger(Number(routed.v.o.typeOrUser))
+  const is2ndPassed = routed.v.o.type !== undefined
+  const is2ndInt = Number.isInteger(Number(routed.v.o.type))
+  const is3rdPassed = routed.v.o.date !== undefined
+  const is3rdDate = /([0-9]{4}-[0-9]{2}-[0-9]{2})/.test(routed.v.o.date)
+  const isUsernamePassed = is1stPassed && !is1stInt
+
+  const username = isUsernamePassed ? routed.v.o.typeOrUser : undefined
+  const type = is1stInt ? Number(routed.v.o.typeOrUser) : is2ndPassed && is2ndInt ? Number(routed.v.o.type) : undefined
+
   const user = new TrackedUser(
-    await routed.bot.DB.get<TrackedUser>('users', { id: routed.author.id })
+    isUsernamePassed
+      ? await routed.bot.DB.get<TrackedUser>('users', { 'ChastiKey.username': new RegExp(`^${username}$`, 'i') })
+      : await routed.bot.DB.get<TrackedUser>('users', { id: routed.author.id })
   )
 
   // If the user has passed a type as an argument, use that over what was saved as their default
-  if (routed.v.o.type !== undefined) {
+  if (type) {
     // Stop invalid number/inputs
-    routed.bot.Log.Command.log(typeof routed.v.o.type, routed.v.o.type)
-    if (routed.v.o.type !== 1 && routed.v.o.type !== 2 && routed.v.o.type !== 3) {
+    routed.bot.Log.Command.log(typeof type, type)
+    if (type !== 1 && type !== 2 && type !== 3) {
       await routed.message.channel.send(routed.$render('ChastiKey.Ticker.InvalidOverrideType'))
       return false
     }
-    user.ChastiKey.ticker.type = routed.v.o.type
+    user.ChastiKey.ticker.type = type
   }
 
-  // Override stored username on user with ckUser one
-  user.ChastiKey.username = String(user.ChastiKey.username)
+  // Override stored username on user with ckUser one if one is not passed
+  user.ChastiKey.username = String(isUsernamePassed ? username : user.ChastiKey.username)
+
+  // Override stored date if one is passed
+  if (is3rdDate) user.ChastiKey.ticker.date = String(routed.v.o.date)
 
   // If the type is only for a single ticker, return just that
   routed.bot.Log.Command.log(Utils.ChastiKey.generateTickerURL(user.ChastiKey))
   if (user.ChastiKey.ticker.type === 1 || user.ChastiKey.ticker.type === 2) {
-    await routed.message.channel.send({
-      files: [new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey), `${Date.now()}-ticker.png`)]
-    })
+    await routed.message.channel.send(
+      routed.$render('ChastiKey.Ticker.IncorrectTimer', { startDate: user.ChastiKey.ticker.date || false, wasDateOverridden: is3rdPassed && is3rdDate }),
+      {
+        files: [new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey), `${Date.now()}-ticker.png`)]
+      }
+    )
     return true
   } else {
-    await routed.message.channel.send(routed.$render('ChastiKey.Ticker.IncorrectTimer'), {
-      files: [
-        new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey, 1), `${Date.now()}-ticker-lockee.png`),
-        new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey, 2), `${Date.now()}-ticker-keyholder.png`)
-      ]
-    })
+    await routed.message.channel.send(
+      routed.$render('ChastiKey.Ticker.IncorrectTimer', { startDate: user.ChastiKey.ticker.date || false, wasDateOverridden: is3rdPassed && is3rdDate }),
+      {
+        files: [
+          new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey, 1), `${Date.now()}-ticker-lockee.png`),
+          new MessageAttachment(Utils.ChastiKey.generateTickerURL(user.ChastiKey, 2), `${Date.now()}-ticker-keyholder.png`)
+        ]
+      }
+    )
     return true
   }
 }

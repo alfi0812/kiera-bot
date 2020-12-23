@@ -3,7 +3,6 @@ import * as Utils from '@/utils'
 import { RouterRouted, ExportRoutes } from '@/router'
 import { lockeeStats, keyholderStats, sharedKeyholdersStats, keyholderLockees } from '@/embedded/chastikey-stats'
 import { TrackedUser } from '@/objects/user'
-import { TrackedBotSetting } from '@/objects/setting'
 
 export const Routes = ExportRoutes(
   {
@@ -14,6 +13,7 @@ export const Routes = ExportRoutes(
     example: '{{prefix}}ck stats lockee',
     name: 'ck-get-stats-lockee',
     validate: '/ck:string/stats:string/lockee:string/user?=string',
+    validateAlias: ['/ck:string/sl:string/user?=string', '/ck:string/s:string/l:string/user?=string'],
     middleware: [Middleware.isCKVerified],
     permissions: {
       defaultEnabled: false,
@@ -28,6 +28,7 @@ export const Routes = ExportRoutes(
     example: '{{prefix}}ck stats keyholder UsernameHere',
     name: 'ck-get-stats-keyholder',
     validate: '/ck:string/stats:string/keyholder:string/user?=string',
+    validateAlias: ['/ck:string/sk:string/user?=string', '/ck:string/s:string/k:string/user?=string'],
     middleware: [Middleware.isCKVerified],
     permissions: {
       defaultEnabled: false,
@@ -211,10 +212,7 @@ export async function getKeyholderStats(routed: RouterRouted) {
 
   // Set cached timestamp for running locks - this SHOULD be close or the same as the KH re-cached time
   const cachedTimestampFromFetch = await routed.bot.DB.get<{ name: string; lastFinishedAt: string }>('scheduled-jobs', { name: 'ChastiKeyAPIRunningLocks' })
-  let cachedTimestamp = null;
-  if(cachedTimestampFromFetch != null){
-	  cachedTimestamp = cachedTimestampFromFetch.lastFinishedAt;
-  }
+  const cachedTimestamp = Number(cachedTimestampFromFetch.lastFinishedAt)
 
   // Send stats
   await routed.message.channel.send(
@@ -275,10 +273,7 @@ export async function getCheckLockeeMultiLocked(routed: RouterRouted) {
 
   // Set cached timestamp for running locks
   const cachedTimestampFromFetch = await routed.bot.DB.get<{ name: string; lastFinishedAt: string }>('scheduled-jobs', { name: 'ChastiKeyAPIRunningLocks' })
-  let cachedTimestamp = null;
-  if(cachedTimestampFromFetch != null){
-	  cachedTimestamp = cachedTimestampFromFetch.lastFinishedAt;
-  }
+  const cachedTimestamp = Number(cachedTimestampFromFetch.lastFinishedAt)
 
   await routed.message.reply(sharedKeyholdersStats(activeLocks, routed.v.o.user, routed.routerStats, cachedTimestamp))
 
@@ -333,11 +328,8 @@ export async function getKeyholderLockees(routed: RouterRouted) {
 
   // Set cached timestamp for running locks
   const cachedTimestampFromFetch = await routed.bot.DB.get<{ name: string; lastFinishedAt: string }>('scheduled-jobs', { name: 'ChastiKeyAPIRunningLocks' })
-  let cachedTimestamp = null;
-  if(cachedTimestampFromFetch != null){
-	  cachedTimestamp = cachedTimestampFromFetch.lastFinishedAt;
-  }
-  
+  const cachedTimestamp = Number(cachedTimestampFromFetch.lastFinishedAt)
+
   await routed.message.reply(keyholderLockees(activeLocks, keyholderData.data.username, routed.routerStats, cachedTimestamp))
 
   // Successful end
