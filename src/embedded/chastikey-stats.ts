@@ -106,7 +106,7 @@ export function lockeeStats(lockeeData: LockeeDataResponse, options: { showRatin
     embed: {
       title: routed.$render('ChastiKey.Stats.Lockee.Title', {
         isVerified: lockeeData.data.discordID ? true : false,
-        verifiedEmoji: '<:verified:748870375139573840> ',
+        verifiedEmoji: '<:verified:795624163255255051> ',
         username: lockeeData.data.username
       }),
       description: description,
