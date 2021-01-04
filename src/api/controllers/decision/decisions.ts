@@ -297,7 +297,7 @@ export async function addDecision(routed: WebRouted) {
   const v = await validate(Validation.Decisions.addDecision(), routed.req.body)
 
   if (v.valid) {
-    const newDeicison = new TrackedDecision({ name: v.o.name, authorID: routed.session.userID, serverID: '732549557938028585' })
+    const newDeicison = new TrackedDecision({ name: v.o.name, authorID: routed.session.userID, serverID: '749692224027099276' })
 
     const decisionId = await routed.Bot.DB.add<TrackedDecision>('decision', newDeicison)
 
