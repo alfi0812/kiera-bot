@@ -25,7 +25,7 @@ export class ChastiKeyVerifiedRoleMonitor extends Task {
     try {
       // Get users who are eligible from the db, but only users who have verified their discord ID
       const stored = await this.Bot.DB.getMultiple<TrackedUser>('users', { 'ChastiKey.isVerified': true })
-      const guilds = this.Bot.client.guilds.cache.filter(g => g.id === '732549557938028585').array()
+      const guilds = this.Bot.client.guilds.cache.filter(g => g.id === '749692224027099276').array()
 
       console.log(`CK Verified Role Monitor::Users Eligible (from users) = ${stored.length}`)
 
