@@ -25,25 +25,25 @@ export interface TrackedKeyholderLockeesStatistics {
 }
 
 const indicatorEmoji = {
-  Frozen: `<:frozenlock:749692224027099276>`,
-  Hidden: `<:hiddencircle:749692224027099276>`,
-  TrustedKH: `<:trustkeyholder:749692224027099276>`
+  Frozen: `<:frozenlock:795624163774562335>`,
+  Hidden: `<:hiddencircle:795624163061923881>`,
+  TrustedKH: `<:trustkeyholder:795624163300605953>`
 }
 
 const cardsEmoji = {
-  Yellow: `<:10:749692224027099276>`,
-  YellowMinus2: `<:12:749692224027099276>`,
-  YellowMinus1: `<:11:749692224027099276>`,
-  YellowAdd3: `<:9_:749692224027099276>`,
-  YellowAdd2: `<:8_:749692224027099276>`,
-  YellowAdd1: `<:7_:749692224027099276>`,
-  Reset: `<:6_:749692224027099276>`,
-  Red: `<:5_:749692224027099276>`,
-  GoAgain: '<:2_:749692224027099276>',
-  Green: `<:3_:749692224027099276>`,
-  DoubleUp: `<:4_:749692224027099276>`,
-  Freeze: `<:1_:749692224027099276>`,
-  Sticky: `<:stickycard:749692224027099276>`
+  Yellow: `<:yellow:795624165725700097>`,
+  YellowMinus2: `<:remove2:795624163468771378>`,
+  YellowMinus1: `<:remove1:795624163301654579>`,
+  YellowAdd3: `<:add3:795624163502981120>`,
+  YellowAdd2: `<:add2:795624163536666654>`,
+  YellowAdd1: `<:add1:795624163167436831>`,
+  Reset: `<:reset:795624163460775936>`,
+  Red: `<:red:795624163112255520>`,
+  GoAgain: '<:go_again:795624163595386880>',
+  Green: `<:green:795624163523559454>`,
+  DoubleUp: `<:double_up:795624163234152479>`,
+  Freeze: `<:freeze:795624163452649472>`,
+  Sticky: `<:sticky:795624163473621002>`
 }
 
 export function lockeeStats(lockeeData: LockeeDataResponse, options: { showRating: boolean }, routed: RouterRouted) {
