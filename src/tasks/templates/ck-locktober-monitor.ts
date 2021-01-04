@@ -43,7 +43,7 @@
 //     try {
 //       // Get users who are eligible from the db, but only users who have verified their discord ID
 //       const stored = await this.Bot.DB.getMultiple<{ username: string; discordID: string }>('ck-locktober', { discordID: { $ne: null } })
-//       const guilds = this.Bot.client.guilds.filter(g => g.id === '473856867768991744' || g.id === '389204362959781899').array()
+//       const guilds = this.Bot.client.guilds.filter(g => g.id === '749692224027099276').array()
 
 //       console.log(`Event Role Monitor::Users Eligible = ${stored.length}`)
 
